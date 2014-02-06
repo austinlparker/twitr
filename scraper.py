@@ -1,4 +1,5 @@
 import StringIO
+from time import strftime
 
 import requests
 from bs4 import BeautifulSoup
@@ -25,20 +26,27 @@ class Scraper(object):
 
         self.session.post(login_url, data)
 
-    def scrape_page(self, response, *args, **kwargs):
-        if response == 200:
-            request = BeautifulSoup(open(*args[0]))
-            content = request.content
-            soup = BeautifulSoup(content)
-            for post in soup.find_all('table'):
-                innerpost = BeautifulSoup(post)
-                new_token = {
-                    innerpost.select('author'),
-                    innerpost.select('postbody'),
-                    time}
-                print new_token
+    def scrape_page(self):
+        page_content = self.thread.content
+        soup = BeautifulSoup(page_content)
+        post_number = 0
+        for post in soup.find_all("table", class_="post"):
+            post_number = post['data-idx']
+            new_token = {
+                'author': post.find("dt", class_="author").get_text("", strip=True),
+                'body': post.find("td", class_= "postbody").get_text(" ", strip=True),
+                'time': strftime('%a, %d %b %Y %H:%M:%S')
+            }
+            print new_token['time']
+            print new_token['author']
+            print new_token['body']
 
 
-    def scrape_thread(self, start_page, threads):
-        return
+
+
+
+    def scrape_thread(self):
+        thread_url = 'http://forums.somethingawful.com/showthread.php?threadid=' + self.thread +'&goto=newpost'
+        self.thread = requests.get(thread_url)
+        return self.scrape_page()
 
