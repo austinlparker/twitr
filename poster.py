@@ -25,9 +25,16 @@ class Poster(object):
         data = {
             'action': 'newreply',
             'threadid': self.thread,
+            'formkey': '',
+            'form_cookie': '',
             'message': message,
-            'next': '/'
+            'parseurl': 'yes',
+            'bookmark': 'no',
+            'disablesmilies': 'no',
+            'signature': 'no',
+            'MAX_FILE_SIZE': '2097152',
+            'attachment': '',
+            'submit': 'Submit Reply'
         }
 
-        self.session.post(post_url, data)
-
+        print self.session.post(post_url, data)
