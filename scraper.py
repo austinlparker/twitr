@@ -5,10 +5,11 @@ from bs4 import BeautifulSoup
 from printer import print_new_posts
 
 class Scraper(object):
-    def __init__(self, username, password, thread):
+    def __init__(self, username, password, thread, posts):
         self.username = username
         self.password = password
         self.thread = thread
+        self.posts = posts
 
         self.session = requests.Session()
         self.login()
@@ -24,9 +25,7 @@ class Scraper(object):
         self.session.post(login_url, data)
 
 
-    @property
     def scrape_page(self):
-        posts = []
         page_content = self.thread.content
         soup = BeautifulSoup(page_content)
         for post in soup.find_all("table", class_="post"):
@@ -41,16 +40,17 @@ class Scraper(object):
             # print new_token['author']
             # print new_token['body']
             # print new_token['postid']
-            posts.append(new_token)
-
-        return posts
+            if new_token['author'] == "Adbot":
+                continue
+            else:
+                self.posts.append(new_token)
 
 
     def scrape_thread(self):
         # next_post = last_post
         thread_url = 'http://forums.somethingawful.com/showthread.php?threadid=' + self.thread +'&goto=newpost'
         self.thread = requests.get(thread_url)
-        posts = [self.scrape_page]
-        next_post = posts[-1]['postid']
+        self.scrape_page()
 
-        print_new_posts(posts)
+
+        print_new_posts(self.posts)
